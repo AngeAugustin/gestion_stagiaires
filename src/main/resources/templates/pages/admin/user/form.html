@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${user.id != null ? 'Modifier un utilisateur' : 'Nouvel utilisateur'})}">
+    <title>Formulaire utilisateur</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="~{fragments/layout :: layout(${user.id != null ? 'Modifier un utilisateur' : 'Nouvel utilisateur'}, ~{::section})}">
+        <section>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form th:action="@{/admin/users/save}" method="post" th:object="${user}">
+                        <input type="hidden" th:field="*{id}">
+                        
+                        <!-- Informations personnelles -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Informations personnelles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{prenom}" class="form-control" id="prenom" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{nom}" class="form-control" id="nom" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mot de passe -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-lock me-2"></i>Mot de passe</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        Mot de passe <span class="text-danger" th:if="${user.id == null}">*</span>
+                                        <small class="text-muted" th:if="${user.id != null}">(Laisser vide pour conserver l'ancien)</small>
+                                    </label>
+                                    <input type="password" th:field="*{password}" class="form-control" id="password" 
+                                           th:required="${user.id == null}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                </div>
+                                <div class="mb-3" th:if="${user.id == null}">
+                                    <label for="confirmPassword" class="form-label">Confirmer le mot de passe <span class="text-danger">*</span></label>
+                                    <input type="password" th:field="*{confirmPassword}" class="form-control" id="confirmPassword" 
+                                           th:required="${user.id == null}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rôles -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-user-tag me-2"></i>Rôles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Sélectionner les rôles</label>
+                                    <div class="form-check" th:each="role : ${allRoles}">
+                                        <input class="form-check-input" type="checkbox" 
+                                               th:id="${'role-' + role.id}" 
+                                               th:name="roleIds" 
+                                               th:value="${role.name}"
+                                               th:checked="${user.roles != null && user.roles.contains(role.name)}">
+                                        <label class="form-check-label" th:for="${'role-' + role.id}" 
+                                               th:text="${#strings.replace(role.name, 'ROLE_', '')}">Rôle</label>
+                                    </div>
+                                    <input type="hidden" th:field="*{roles}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/admin/users}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Script pour gérer les rôles -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fonction pour mettre à jour le champ caché des rôles
+            function updateRolesField() {
+                var roleCheckboxes = document.querySelectorAll('input[name="roleIds"]:checked');
+                var roles = Array.from(roleCheckboxes).map(function(checkbox) {
+                    return checkbox.value;
+                }).join(',');
+                
+                document.getElementById('roles').value = roles;
+            }
+            
+            // Ajouter les écouteurs d'événements pour les cases à cocher
+            var checkboxes = document.querySelectorAll('input[name="roleIds"]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', updateRolesField);
+            });
+            
+            // Initialiser le champ caché des rôles
+            updateRolesField();
+        });
+    </script>
+</body>
+</html>

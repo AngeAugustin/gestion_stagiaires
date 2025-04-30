@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${title})}">
+    <title>Titre par défaut</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Layout principal -->
+    <div th:fragment="layout(title, content)" class="d-flex flex-column min-vh-100">
+        <!-- Navbar -->
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
+        
+        <!-- Contenu -->
+        <main class="flex-shrink-0 py-4">
+            <div class="container">
+                <!-- Titre de la page -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2 class="border-bottom pb-2" th:text="${title}">Titre par défaut</h2>
+                    </div>
+                </div>
+                
+                <!-- Messages d'alerte -->
+                <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Message de succès</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${warning != null}" class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span th:text="${warning}">Message d'avertissement</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Message d'erreur</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${info != null}" class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span th:text="${info}">Message d'information</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Contenu spécifique de la page -->
+                <div th:replace="${content}">
+                    Contenu par défaut
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <div th:replace="~{fragments/footer :: footer}"></div>
+        
+        <!-- Scripts -->
+        <div th:replace="~{fragments/footer :: scripts}"></div>
+    </div>
+</body>
+</html>

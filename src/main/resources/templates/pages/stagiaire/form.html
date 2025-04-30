@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${stagiaire.id != null ? 'Modifier un stagiaire' : 'Nouveau stagiaire'})}">
+    <title>Formulaire stagiaire</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="~{fragments/layout :: layout(${stagiaire.id != null ? 'Modifier un stagiaire' : 'Nouveau stagiaire'}, ~{::section})}">
+        <section>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form th:action="@{/stagiaire/save}" method="post" th:object="${stagiaire}">
+                        <input type="hidden" th:field="*{id}">
+                        
+                        <!-- Informations personnelles -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Informations personnelles</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{prenom}" class="form-control" id="prenom" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                                        <input type="text" th:field="*{nom}" class="form-control" id="nom" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="telephone" class="form-label">Téléphone</label>
+                                        <input type="tel" th:field="*{telephone}" class="form-control" id="telephone">
+                                        <div class="text-danger" th:if="${#fields.hasErrors('telephone')}" th:errors="*{telephone}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Informations sur le stage -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-graduation-cap me-2"></i>Informations sur le stage</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="ecole" class="form-label">École / Université</label>
+                                        <input type="text" th:field="*{ecole}" class="form-control" id="ecole">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="formation" class="form-label">Formation</label>
+                                        <input type="text" th:field="*{formation}" class="form-control" id="formation">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="niveau" class="form-label">Niveau d'études</label>
+                                        <select th:field="*{niveau}" class="form-select" id="niveau">
+                                            <option value="">-- Sélectionner --</option>
+                                            <option value="BAC+1">BAC+1</option>
+                                            <option value="BAC+2">BAC+2</option>
+                                            <option value="BAC+3">BAC+3</option>
+                                            <option value="BAC+4">BAC+4</option>
+                                            <option value="BAC+5">BAC+5</option>
+                                            <option value="BAC+6 ou plus">BAC+6 ou plus</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="dateDebut" class="form-label">Date de début</label>
+                                        <input type="date" th:field="*{dateDebut}" class="form-control" id="dateDebut">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="dateFin" class="form-label">Date de fin</label>
+                                        <input type="date" th:field="*{dateFin}" class="form-control" id="dateFin">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description / Objectifs du stage</label>
+                                    <textarea th:field="*{description}" class="form-control" id="description" rows="4"></textarea>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Statut et encadrant (uniquement pour les utilisateurs connectés) -->
+                        <div class="card mb-4" sec:authorize="isAuthenticated()">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0"><i class="fas fa-cog me-2"></i>Administration</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="statut" class="form-label">Statut</label>
+                                        <select th:field="*{statut}" class="form-select" id="statut">
+                                            <option th:each="status : ${T(com.gestionstagiaires.model.StatutStage).values()}"
+                                                    th:value="${status}"
+                                                    th:text="${status.libelle}">Statut</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="encadrantId" class="form-label">Encadrant</label>
+                                        <select th:field="*{encadrantId}" class="form-select" id="encadrantId">
+                                            <option value="">-- Aucun encadrant --</option>
+                                            <option th:each="user : ${users}"
+                                                    th:value="${user.id}"
+                                                    th:text="${user.prenom + ' ' + user.nom}">Encadrant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a th:href="${stagiaire.id != null ? '/stagiaire/list' : '/'}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

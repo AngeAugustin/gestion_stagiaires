@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer" class="footer bg-light py-4 mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 - Gestion des Stagiaires</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">Projet 10 - Gestion des stagiaires</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts communs à insérer avant la fermeture du body -->
+    <div th:fragment="scripts">
+        <!-- JQuery -->
+        <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+        
+        <!-- Bootstrap JS -->
+        <script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+        
+        <!-- Custom JS -->
+        <script th:src="@{/static/js/main.js}"></script>
+        
+        <!-- Activation des tooltips Bootstrap -->
+        <script>
+            $(function () {
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Détails du stagiaire')}">
+    <title>Détails du stagiaire</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="~{fragments/layout :: layout('Détails du stagiaire', ~{::section})}">
+        <section>
+            <!-- Barre d'actions -->
+            <div class="mb-4">
+                <div class="btn-group">
+                    <a th:href="@{/stagiaire/list}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    <a th:href="@{/stagiaire/edit/{id}(id=${stagiaire.id})}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a sec:authorize="hasRole('ADMIN')" 
+                       th:href="@{/stagiaire/delete/{id}(id=${stagiaire.id})}" 
+                       class="btn btn-outline-danger"
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce stagiaire ?')">
+                        <i class="fas fa-trash-alt me-1"></i>Supprimer
+                    </a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Informations du stagiaire -->
+                <div class="col-md-8">
+                    <!-- Informations personnelles -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                            <h5 class="card-title mb-0"><i class="fas fa-user me-2"></i>Informations personnelles</h5>
+                            <span th:class="${
+                                stagiaire.statut.name() == 'EN_ATTENTE' ? 'badge bg-warning' : 
+                                stagiaire.statut.name() == 'ACCEPTE' ? 'badge bg-success' : 
+                                stagiaire.statut.name() == 'REFUSE' ? 'badge bg-danger' : 
+                                stagiaire.statut.name() == 'EN_COURS' ? 'badge bg-info' : 
+                                'badge bg-secondary'
+                            }" th:text="${stagiaire.statut.libelle}">Statut</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">Nom</p>
+                                    <h5 th:text="${stagiaire.nom}">Nom</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">Prénom</p>
+                                    <h5 th:text="${stagiaire.prenom}">Prénom</h5>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">Email</p>
+                                    <p><a th:href="'mailto:' + ${stagiaire.email}" th:text="${stagiaire.email}">Email</a></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">Téléphone</p>
+                                    <p th:text="${stagiaire.telephone != null && !stagiaire.telephone.isEmpty() ? stagiaire.telephone : '-'}">Téléphone</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations sur le stage -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0"><i class="fas fa-graduation-cap me-2"></i>Informations sur le stage</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">École / Université</p>
+                                    <p th:text="${stagiaire.ecole != null && !stagiaire.ecole.isEmpty() ? stagiaire.ecole : '-'}">École</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1 text-muted">Formation</p>
+                                    <p th:text="${stagiaire.formation != null && !stagiaire.formation.isEmpty() ? stagiaire.formation : '-'}">Formation</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <p class="mb-1 text-muted">Niveau d'études</p>
+                                    <p th:text="${stagiaire.niveau != null && !stagiaire.niveau.isEmpty() ? stagiaire.niveau : '-'}">Niveau</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-1 text-muted">Date de début</p>
+                                    <p th:text="${stagiaire.dateDebut != null ? #temporals.format(stagiaire.dateDebut, 'dd/MM/yyyy') : '-'}">Date de début</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-1 text-muted">Date de fin</p>
+                                    <p th:text="${stagiaire.dateFin != null ? #temporals.format(stagiaire.dateFin, 'dd/MM/yyyy') : '-'}">Date de fin</p>
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <p class="mb-1 text-muted">Description / Objectifs du stage</p>
+                                <p th:utext="${stagiaire.description != null && !stagiaire.description.isEmpty() ? #strings.replace(#strings.escapeXml(stagiaire.description), '&#10;', '<br/>') : '-'}">
+                                    Description
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Encadrant -->
+                    <div class="card mb-4 shadow-sm" th:if="${stagiaire.encadrant != null}">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0"><i class="fas fa-user-tie me-2"></i>Encadrant</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-user-circle fa-3x text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 th:text="${stagiaire.encadrant.prenom + ' ' + stagiaire.encadrant.nom}">Nom de l'encadrant</h5>
+                                    <p class="mb-0">
+                                        <a th:href="'mailto:' + ${stagiaire.encadrant.email}" th:text="${stagiaire.encadrant.email}">
+                                            Email de l'encadrant
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Formulaire de traitement -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0"><i class="fas fa-tasks me-2"></i>Traiter la demande</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/stagiaire/traiter}" method="post" th:object="${traitementDto}">
+                                <input type="hidden" th:field="*{stagiaireId}" th:value="${stagiaire.id}">
+                                
+                                <div class="mb-3">
+                                    <label for="statut" class="form-label">Statut</label>
+                                    <select th:field="*{statut}" class="form-select" id="statut" required>
+                                        <option th:each="status : ${T(com.gestionstagiaires.model.StatutStage).values()}"
+                                                th:value="${status}"
+                                                th:text="${status.libelle}"
+                                                th:selected="${stagiaire.statut == status}">Statut</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="encadrantId" class="form-label">Encadrant</label>
+                                    <select th:field="*{encadrantId}" class="form-select" id="encadrantId">
+                                        <option value="">-- Aucun encadrant --</option>
+                                        <option th:each="user : ${users}"
+                                                th:value="${user.id}"
+                                                th:text="${user.prenom + ' ' + user.nom}"
+                                                th:selected="${stagiaire.encadrant != null && stagiaire.encadrant.id == user.id}">Encadrant</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message au stagiaire</label>
+                                    <textarea th:field="*{message}" class="form-control" id="message" rows="4" 
+                                              placeholder="Message qui sera envoyé par email au stagiaire..."></textarea>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-1"></i>Traiter la demande
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

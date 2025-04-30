@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Tableau de bord')}">
+    <title>Tableau de bord</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div th:replace="~{fragments/layout :: layout('Tableau de bord', ~{::section})}">
+        <section>
+            <!-- Statistiques -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">En attente</h6>
+                                    <h2 class="mb-0" th:text="${nbEnAttente}">0</h2>
+                                </div>
+                                <i class="fas fa-clock fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/stagiaire/list}" class="text-white text-decoration-none">
+                                <small>Voir les détails <i class="fas fa-arrow-right ms-1"></i></small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Acceptés</h6>
+                                    <h2 class="mb-0" th:text="${nbAcceptes}">0</h2>
+                                </div>
+                                <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/stagiaire/list}" class="text-white text-decoration-none">
+                                <small>Voir les détails <i class="fas fa-arrow-right ms-1"></i></small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">En cours</h6>
+                                    <h2 class="mb-0" th:text="${nbEnCours}">0</h2>
+                                </div>
+                                <i class="fas fa-user-graduate fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/stagiaire/list}" class="text-white text-decoration-none">
+                                <small>Voir les détails <i class="fas fa-arrow-right ms-1"></i></small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-title">Terminés</h6>
+                                    <h2 class="mb-0" th:text="${nbTermines}">0</h2>
+                                </div>
+                                <i class="fas fa-award fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a th:href="@{/stagiaire/list}" class="text-white text-decoration-none">
+                                <small>Voir les détails <i class="fas fa-arrow-right ms-1"></i></small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions rapides -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Actions rapides</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-3">
+                                <a th:href="@{/stagiaire/list}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-2"></i>Liste des stagiaires
+                                </a>
+                                <a th:href="@{/stagiaire/new}" class="btn btn-outline-success">
+                                    <i class="fas fa-user-plus me-2"></i>Ajouter un stagiaire
+                                </a>
+                                <a th:href="@{/admin/users}" sec:authorize="hasRole('ADMIN')" class="btn btn-outline-secondary">
+                                    <i class="fas fa-users me-2"></i>Gérer les utilisateurs
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-search me-2"></i>Recherche rapide</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/stagiaire/search}" method="get">
+                                <div class="input-group mb-3">
+                                    <input type="text" name="keyword" class="form-control" placeholder="Rechercher un stagiaire...">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search me-1"></i>Rechercher
+                                    </button>
+                                </div>
+                                <p class="text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>Vous pouvez rechercher par nom, prénom ou email
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mes stagiaires (si l'utilisateur est un encadrant) -->
+            <div class="row" th:if="${mesStagiaires != null && !mesStagiaires.empty}">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fas fa-users me-2"></i>Mes stagiaires</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Email</th>
+                                            <th>Période</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="stagiaire : ${mesStagiaires}">
+                                            <td th:text="${stagiaire.nom}">Nom</td>
+                                            <td th:text="${stagiaire.prenom}">Prénom</td>
+                                            <td th:text="${stagiaire.email}">Email</td>
+                                            <td>
+                                                <span th:if="${stagiaire.dateDebut != null}" 
+                                                      th:text="${#temporals.format(stagiaire.dateDebut, 'dd/MM/yyyy')}"></span>
+                                                -
+                                                <span th:if="${stagiaire.dateFin != null}" 
+                                                      th:text="${#temporals.format(stagiaire.dateFin, 'dd/MM/yyyy')}"></span>
+                                            </td>
+                                            <td>
+                                                <span th:class="${
+                                                    stagiaire.statut.name() == 'EN_ATTENTE' ? 'badge bg-warning' : 
+                                                    stagiaire.statut.name() == 'ACCEPTE' ? 'badge bg-success' : 
+                                                    stagiaire.statut.name() == 'REFUSE' ? 'badge bg-danger' : 
+                                                    stagiaire.statut.name() == 'EN_COURS' ? 'badge bg-info' : 
+                                                    'badge bg-secondary'
+                                                }" th:text="${stagiaire.statut.libelle}">Statut</span>
+                                            </td>
+                                            <td>
+                                                <a th:href="@{/stagiaire/view/{id}(id=${stagiaire.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/stagiaire/edit/{id}(id=${stagiaire.id})}" 
+                                                   class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
